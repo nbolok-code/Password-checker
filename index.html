@@ -1,975 +1,796 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Password Strength Checker — Research Tool</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg:       #0a0c10;
-    --surface:  #111318;
-    --card:     #161a22;
-    --border:   #242830;
-    --text:     #e8eaf0;
-    --muted:    #6b7280;
-    --accent:   #00e5ff;
-    --green:    #00e676;
-    --yellow:   #ffea00;
-    --orange:   #ff9100;
-    --red:      #ff1744;
-    --purple:   #d500f9;
-  }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 1rem 0.75rem 3rem;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,229,255,0.07), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(213,0,249,0.05), transparent);
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    padding: 0 0.5rem;
-  }
-
-  .badge {
-    display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.6rem, 2vw, 0.7rem);
-    letter-spacing: 0.15em;
-    color: var(--accent);
-    border: 1px solid rgba(0,229,255,0.3);
-    padding: 0.25rem 0.75rem;
-    border-radius: 2px;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  h1 {
-    font-size: clamp(1.4rem, 4vw, 2.8rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 0.5rem;
-  }
-
-  h1 span { color: var(--accent); }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: clamp(0.75rem, 2vw, 0.9rem);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .container { max-width: 960px; margin: 0 auto; }
-
-  /* Input area */
-  .input-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: clamp(1rem, 3vw, 1.75rem);
-    margin-bottom: 1.25rem;
-    position: relative;
-  }
-
-  .input-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.65rem, 1.5vw, 0.72rem);
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-    display: block;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-
-  .pw-input {
-    flex: 1;
-    min-width: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    letter-spacing: 0.05em;
-    width: 100%;
-  }
-
-  .pw-input:focus { border-color: var(--accent); }
-
-  .analyze-btn {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 0.85rem 1.25rem;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    white-space: nowrap;
-    letter-spacing: 0.02em;
-    touch-action: manipulation;
-  }
-
-  .analyze-btn:hover { opacity: 0.88; }
-  .analyze-btn:active { transform: scale(0.97); }
-
-  .clear-btn {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-    touch-action: manipulation;
-    white-space: nowrap;
-  }
-
-  .clear-btn:hover { color: var(--text); border-color: var(--text); }
-
-  /* Mobile button adjustments */
-  @media (max-width: 480px) {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Password Strength Checker — Research Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --card: #161a22;
+      --border: #242830;
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --accent: #00e5ff;
+      --green: #00e676;
+      --yellow: #ffea00;
+      --orange: #ff9100;
+      --red: #ff1744;
+      --purple: #d500f9;
+    }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem 0.75rem 3rem;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,229,255,0.07), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(213,0,249,0.05), transparent);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.6rem, 2vw, 0.7rem);
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      border: 1px solid rgba(0,229,255,0.3);
+      padding: 0.25rem 0.75rem;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(1.4rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    h1 span { color: var(--accent); }
+    .subtitle {
+      color: var(--muted);
+      font-size: clamp(0.75rem, 2vw, 0.9rem);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    .input-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: clamp(1rem, 3vw, 1.75rem);
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+    .input-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.65rem, 1.5vw, 0.72rem);
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
     .input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+    .pw-input {
+      flex: 1;
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      letter-spacing: 0.05em;
+      width: 100%;
+    }
+    .pw-input:focus { border-color: var(--accent); }
+    .analyze-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      touch-action: manipulation;
+    }
+    .analyze-btn:hover { opacity: 0.88; }
+    .analyze-btn:active { transform: scale(0.97); }
+    .clear-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      touch-action: manipulation;
+      white-space: nowrap;
+    }
+    .clear-btn:hover { color: var(--text); border-color: var(--text); }
+    @media (max-width: 480px) {
+      .input-row { flex-direction: column; gap: 0.5rem; }
+      .pw-input { width: 100%; order: 1; }
+      .analyze-btn { width: 100%; order: 2; text-align: center; justify-content: center; }
+      .clear-btn { width: 100%; order: 3; text-align: center; }
+    }
+    .presets { margin-top: 1rem; }
+    .presets-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.6rem, 1.5vw, 0.68rem);
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .preset-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+      white-space: nowrap;
+    }
+    .chip:hover, .chip:active { color: var(--accent); border-color: var(--accent); }
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) { .results-grid { grid-template-columns: 1fr; gap: 0.75rem; } }
+    .method-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: clamp(1rem, 3vw, 1.5rem);
+      transition: border-color 0.3s;
+    }
+    .method-card.active-trad { border-color: rgba(0,229,255,0.4); }
+    .method-card.active-heur { border-color: rgba(213,0,249,0.4); }
+    .method-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .method-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-trad { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+    .dot-heur { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+    .method-title {
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .score-display {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .score-num {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      font-family: 'JetBrains Mono', monospace;
+      transition: color 0.4s;
+    }
+    .score-max {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-size: clamp(0.85rem, 2vw, 1rem);
+    }
+    .score-label {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: color 0.4s;
+      margin-bottom: 0.75rem;
+    }
+    .score-bar {
+      height: 4px;
+      background: var(--surface);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.4s;
+      width: 0%;
+    }
+    .feedback-list {
+      list-style: none;
+      display: flex;
       flex-direction: column;
+      gap: 0.35rem;
+    }
+    .feedback-list li {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.65rem, 1.2vw, 0.72rem);
+      color: var(--muted);
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .feedback-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .feedback-list li.warn::before { color: var(--orange); }
+    .feedback-list li.bad::before { color: var(--red); }
+    .feedback-list li.good::before { color: var(--green); content: '✓'; }
+    .lvl-0 { color: var(--red); }
+    .lvl-1 { color: var(--orange); }
+    .lvl-2 { color: var(--yellow); }
+    .lvl-3 { color: var(--green); }
+    .lvl-4 { color: var(--accent); }
+    .fill-0 { background: var(--red); width: 10% !important; }
+    .fill-1 { background: var(--orange); width: 30% !important; }
+    .fill-2 { background: var(--yellow); width: 55% !important; }
+    .fill-3 { background: var(--green); width: 78% !important; }
+    .fill-4 { background: var(--accent); width: 100% !important; }
+    .log-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
       gap: 0.5rem;
     }
-    
-    .pw-input {
-      width: 100%;
-      order: 1;
+    .log-title {
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
-    
-    .analyze-btn {
-      width: 100%;
-      order: 2;
-      text-align: center;
-      justify-content: center;
-    }
-    
-    .clear-btn {
-      width: 100%;
-      order: 3;
-      text-align: center;
-    }
-  }
-
-  /* Preset passwords */
-  .presets {
-    margin-top: 1rem;
-  }
-
-  .presets-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.6rem, 1.5vw, 0.68rem);
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
-  .preset-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
-  .chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.65rem, 1.5vw, 0.75rem);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.35rem 0.65rem;
-    cursor: pointer;
-    color: var(--muted);
-    transition: color 0.15s, border-color 0.15s;
-    touch-action: manipulation;
-    white-space: nowrap;
-  }
-
-  .chip:hover, .chip:active { color: var(--accent); border-color: var(--accent); }
-
-  /* Results grid */
-  .results-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  @media (max-width: 768px) { 
-    .results-grid { 
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    } 
-  }
-
-  .method-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: clamp(1rem, 3vw, 1.5rem);
-    transition: border-color 0.3s;
-  }
-
-  .method-card.active-trad { border-color: rgba(0,229,255,0.4); }
-  .method-card.active-heur { border-color: rgba(213,0,249,0.4); }
-
-  .method-header {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
-  }
-
-  .method-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot-trad { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-  .dot-heur { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
-
-  .method-title {
-    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .score-display {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .score-num {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1;
-    font-family: 'JetBrains Mono', monospace;
-    transition: color 0.4s;
-  }
-
-  .score-max {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-    font-size: clamp(0.85rem, 2vw, 1rem);
-  }
-
-  .score-label {
-    font-size: clamp(0.9rem, 2vw, 1rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    transition: color 0.4s;
-    margin-bottom: 0.75rem;
-  }
-
-  .score-bar {
-    height: 4px;
-    background: var(--surface);
-    border-radius: 2px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-  }
-
-  .score-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.4s;
-    width: 0%;
-  }
-
-  .feedback-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .feedback-list li {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.65rem, 1.2vw, 0.72rem);
-    color: var(--muted);
-    padding-left: 1rem;
-    position: relative;
-    line-height: 1.4;
-    word-break: break-word;
-  }
-
-  .feedback-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-  }
-
-  .feedback-list li.warn::before { color: var(--orange); }
-  .feedback-list li.bad::before  { color: var(--red); }
-  .feedback-list li.good::before { color: var(--green); content: '✓'; }
-
-  /* Color levels */
-  .lvl-0 { color: var(--red); }
-  .lvl-1 { color: var(--orange); }
-  .lvl-2 { color: var(--yellow); }
-  .lvl-3 { color: var(--green); }
-  .lvl-4 { color: var(--accent); }
-
-  .fill-0 { background: var(--red);    width: 10% !important; }
-  .fill-1 { background: var(--orange); width: 30% !important; }
-  .fill-2 { background: var(--yellow); width: 55% !important; }
-  .fill-3 { background: var(--green);  width: 78% !important; }
-  .fill-4 { background: var(--accent); width: 100% !important; }
-
-  /* Log table */
-  .log-section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .log-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .log-title {
-    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .log-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .log-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.65rem, 1.2vw, 0.75rem);
-    color: var(--accent);
-  }
-
-  .export-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
-    padding: 0.3rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-    touch-action: manipulation;
-    white-space: nowrap;
-  }
-
-  .export-btn:hover { color: var(--green); border-color: var(--green); }
-
-  .log-table-wrap { 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch;
-    max-height: 50vh;
-    overflow-y: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.65rem, 1.2vw, 0.75rem);
-    min-width: 600px;
-  }
-
-  thead th {
-    background: var(--surface);
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    color: var(--muted);
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: clamp(0.6rem, 1vw, 0.68rem);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  tbody tr {
-    border-bottom: 1px solid rgba(36,40,48,0.6);
-    transition: background 0.15s;
-  }
-
-  tbody tr:hover { background: rgba(255,255,255,0.02); }
-  tbody tr:last-child { border-bottom: none; }
-
-  td {
-    padding: 0.5rem 0.75rem;
-    color: var(--text);
-    white-space: nowrap;
-  }
-
-  td.pw-cell {
-    font-weight: 700;
-    color: var(--accent);
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .tag {
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    font-size: clamp(0.6rem, 1vw, 0.68rem);
-    font-weight: 700;
-    letter-spacing: 0.06em;
-  }
-
-  .tag-0 { background: rgba(255,23,68,0.15);  color: var(--red); }
-  .tag-1 { background: rgba(255,145,0,0.15);  color: var(--orange); }
-  .tag-2 { background: rgba(255,234,0,0.15);  color: var(--yellow); }
-  .tag-3 { background: rgba(0,230,118,0.15);  color: var(--green); }
-  .tag-4 { background: rgba(0,229,255,0.15);  color: var(--accent); }
-
-  .empty-log {
-    padding: 2rem 1rem;
-    text-align: center;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(0.7rem, 1.2vw, 0.8rem);
-  }
-
-  .flash {
-    animation: flashIn 0.35s ease;
-  }
-
-  @keyframes flashIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .placeholder-score {
-    color: var(--border);
-  }
-
-  /* Scrollbar styling */
-  .log-table-wrap::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
-  }
-
-  .log-table-wrap::-webkit-scrollbar-track {
-    background: var(--surface);
-  }
-
-  .log-table-wrap::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-  }
-
-  /* Touch-friendly spacing */
-  @media (hover: none) and (pointer: coarse) {
-    .chip, .analyze-btn, .clear-btn, .export-btn {
-      min-height: 44px;
-      display: inline-flex;
+    .log-actions {
+      display: flex;
       align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
-    
-    .feedback-list li {
-      padding: 0.2rem 0 0.2rem 1.2rem;
+    .log-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.65rem, 1.2vw, 0.75rem);
+      color: var(--accent);
     }
-  }
-
-  /* Very small screens */
-  @media (max-width: 360px) {
-    body {
-      padding: 0.75rem 0.5rem 2rem;
+    .export-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      touch-action: manipulation;
+      white-space: nowrap;
     }
-    
-    .input-card {
-      padding: 0.75rem;
+    .export-btn:hover { color: var(--green); border-color: var(--green); }
+    .log-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 50vh;
+      overflow-y: auto;
     }
-    
-    .method-card {
-      padding: 0.75rem;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.65rem, 1.2vw, 0.75rem);
+      min-width: 600px;
     }
-    
-    .chip {
-      font-size: 0.6rem;
-      padding: 0.3rem 0.5rem;
+    thead th {
+      background: var(--surface);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: clamp(0.6rem, 1vw, 0.68rem);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
-  }
-</style>
+    tbody tr { border-bottom: 1px solid rgba(36,40,48,0.6); transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: 0.5rem 0.75rem; color: var(--text); white-space: nowrap; }
+    td.pw-cell {
+      font-weight: 700;
+      color: var(--accent);
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-size: clamp(0.6rem, 1vw, 0.68rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .tag-0 { background: rgba(255,23,68,0.15); color: var(--red); }
+    .tag-1 { background: rgba(255,145,0,0.15); color: var(--orange); }
+    .tag-2 { background: rgba(255,234,0,0.15); color: var(--yellow); }
+    .tag-3 { background: rgba(0,230,118,0.15); color: var(--green); }
+    .tag-4 { background: rgba(0,229,255,0.15); color: var(--accent); }
+    .empty-log {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+    }
+    .flash { animation: flashIn 0.35s ease; }
+    @keyframes flashIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .placeholder-score { color: var(--border); }
+    .log-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
+    .log-table-wrap::-webkit-scrollbar-track { background: var(--surface); }
+    .log-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    @media (hover: none) and (pointer: coarse) {
+      .chip, .analyze-btn, .clear-btn, .export-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .feedback-list li { padding: 0.2rem 0 0.2rem 1.2rem; }
+    }
+    @media (max-width: 360px) {
+      body { padding: 0.75rem 0.5rem 2rem; }
+      .input-card { padding: 0.75rem; }
+      .method-card { padding: 0.75rem; }
+      .chip { font-size: 0.6rem; padding: 0.3rem 0.5rem; }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="badge">Research Tool · Password Analysis</div>
+      <h1>Password <span>Strength</span> Checker</h1>
+      <p class="subtitle">Traditional vs Heuristic — Dual Engine Comparison</p>
+    </header>
 
-<div class="container">
-  <header>
-    <div class="badge">Research Tool · Password Analysis</div>
-    <h1>Password <span>Strength</span> Checker</h1>
-    <p class="subtitle">Traditional vs Heuristic — Dual Engine Comparison</p>
-  </header>
-
-  <!-- Input -->
-  <div class="input-card">
-    <label class="input-label" for="pwInput">Enter Password to Analyse</label>
-    <div class="input-row">
-      <input class="pw-input" type="text" id="pwInput" placeholder="Type or paste a password..." autocomplete="off" spellcheck="false" inputmode="text">
-      <button class="analyze-btn" onclick="analyse()">Analyse</button>
-      <button class="clear-btn" onclick="clearInput()">Clear</button>
+    <!-- Input card -->
+    <div class="input-card">
+      <label class="input-label" for="pwInput">Enter Password to Analyse</label>
+      <div class="input-row">
+        <input class="pw-input" type="text" id="pwInput" placeholder="Type or paste a password..." autocomplete="off" spellcheck="false" inputmode="text">
+        <button class="analyze-btn" id="analyzeBtn">Analyse</button>
+        <button class="clear-btn" id="clearBtn">Clear</button>
+      </div>
+      <div class="presets">
+        <span class="presets-label">Quick test passwords →</span>
+        <div class="preset-chips" id="chips"></div>
+      </div>
     </div>
 
-    <div class="presets">
-      <span class="presets-label">Quick test passwords →</span>
-      <div class="preset-chips" id="chips"></div>
+    <!-- Results grid -->
+    <div class="results-grid">
+      <div class="method-card" id="tradCard">
+        <div class="method-header">
+          <div class="method-dot dot-trad"></div>
+          <div class="method-title">Traditional Method</div>
+        </div>
+        <div class="score-display">
+          <div class="score-num placeholder-score" id="tradScore">—</div>
+          <div class="score-max">/4</div>
+        </div>
+        <div class="score-label placeholder-score" id="tradLabel">Awaiting input</div>
+        <div class="score-bar"><div class="score-fill" id="tradBar"></div></div>
+        <ul class="feedback-list" id="tradFeedback"></ul>
+      </div>
+      <div class="method-card" id="heurCard">
+        <div class="method-header">
+          <div class="method-dot dot-heur"></div>
+          <div class="method-title">Heuristic Method</div>
+        </div>
+        <div class="score-display">
+          <div class="score-num placeholder-score" id="heurScore">—</div>
+          <div class="score-max">/4</div>
+        </div>
+        <div class="score-label placeholder-score" id="heurLabel">Awaiting input</div>
+        <div class="score-bar"><div class="score-fill" id="heurBar"></div></div>
+        <ul class="feedback-list" id="heurFeedback"></ul>
+      </div>
+    </div>
+
+    <!-- Log section -->
+    <div class="log-section">
+      <div class="log-header">
+        <span class="log-title">Results Log</span>
+        <div class="log-actions">
+          <span class="log-count" id="logCount">0 tests recorded</span>
+          <button class="export-btn" id="exportCSVBtn">Export CSV</button>
+          <button class="export-btn" id="clearLogBtn" style="color:#ff1744;border-color:rgba(255,23,68,0.3)">Clear Log</button>
+        </div>
+      </div>
+      <div class="log-table-wrap">
+        <div class="empty-log" id="emptyLog">No passwords tested yet. Enter a password above to begin.</div>
+        <table id="logTable" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th><th>Password</th><th>Len</th><th>Trad.</th><th>Class</th><th>Heur.</th><th>Class</th><th>Match</th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Results -->
-  <div class="results-grid">
-    <!-- Traditional -->
-    <div class="method-card" id="tradCard">
-      <div class="method-header">
-        <div class="method-dot dot-trad"></div>
-        <div class="method-title">Traditional Method</div>
-      </div>
-      <div class="score-display">
-        <div class="score-num placeholder-score" id="tradScore">—</div>
-        <div class="score-max">/4</div>
-      </div>
-      <div class="score-label placeholder-score" id="tradLabel">Awaiting input</div>
-      <div class="score-bar"><div class="score-fill" id="tradBar"></div></div>
-      <ul class="feedback-list" id="tradFeedback"></ul>
-    </div>
+  <script>
+    (function() {
+      // ---------- DATA ----------
+      const presets = [
+        { label: "123456", cat: "Common" },
+        { label: "password", cat: "Common" },
+        { label: "password123", cat: "Common" },
+        { label: "abcdef123", cat: "Sequential" },
+        { label: "qwerty", cat: "Keyboard" },
+        { label: "qwerty!@#", cat: "Keyboard" },
+        { label: "aaaa1111", cat: "Repeated" },
+        { label: "sunshine2024", cat: "Dictionary" },
+        { label: "xK9#mP2!", cat: "Random" },
+        { label: "tR7$vL4@", cat: "Random" },
+        { label: "MyD0g!sN@med$am", cat: "Long/Complex" },
+        { label: "Blue$ky42!", cat: "Mixed" }
+      ];
 
-    <!-- Heuristic -->
-    <div class="method-card" id="heurCard">
-      <div class="method-header">
-        <div class="method-dot dot-heur"></div>
-        <div class="method-title">Heuristic Method</div>
-      </div>
-      <div class="score-display">
-        <div class="score-num placeholder-score" id="heurScore">—</div>
-        <div class="score-max">/4</div>
-      </div>
-      <div class="score-label placeholder-score" id="heurLabel">Awaiting input</div>
-      <div class="score-bar"><div class="score-fill" id="heurBar"></div></div>
-      <ul class="feedback-list" id="heurFeedback"></ul>
-    </div>
-  </div>
+      const COMMON = new Set([
+        "123456","password","123456789","12345678","12345","1234567","qwerty",
+        "abc123","111111","123123","admin","letmein","welcome","monkey","dragon",
+        "master","sunshine","princess","1234","password1","iloveyou","superman",
+        "batman","football","shadow","123321","000000","654321","qwerty123",
+        "password123","pass123","pass1234","mypassword","login","qwerty1","1q2w3e",
+        "zxcvbn","asdfgh","1234567890","987654321","qazwsx","passw0rd","p@ssword",
+        "qwertyuiop","abcdef","abcdef123","abc1234","sunshine2024"
+      ]);
 
-  <!-- Log table -->
-  <div class="log-section">
-    <div class="log-header">
-      <span class="log-title">Results Log</span>
-      <div class="log-actions">
-        <span class="log-count" id="logCount">0 tests recorded</span>
-        <button class="export-btn" onclick="exportCSV()">Export CSV</button>
-        <button class="export-btn" onclick="clearLog()" style="color:#ff1744;border-color:rgba(255,23,68,0.3)">Clear Log</button>
-      </div>
-    </div>
-    <div class="log-table-wrap">
-      <div class="empty-log" id="emptyLog">No passwords tested yet. Enter a password above to begin.</div>
-      <table id="logTable" style="display:none">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Password</th>
-            <th>Len</th>
-            <th>Trad.</th>
-            <th>Class</th>
-            <th>Heur.</th>
-            <th>Class</th>
-            <th>Match</th>
-          </tr>
-        </thead>
-        <tbody id="logBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+      const SEQ_ALPHA = ["abcdef","bcdefg","cdefgh","defghi","efghij","fghijk",
+        "ghijkl","hijklm","ijklmn","jklmno","klmnop","lmnopq",
+        "mnopqr","nopqrs","opqrst","pqrstu","qrstuv","rstuvw",
+        "stuvwx","tuvwxy","uvwxyz","zyxwvu","yxwvut"];
+      const SEQ_NUM = ["0123","1234","2345","3456","4567","5678","6789",
+        "01234","12345","23456","34567","45678","56789",
+        "012345","123456","234567","345678","456789",
+        "0123456","1234567","9876","87654","98765","987654","9876543"];
+      const KB_PATTERNS = ["qwerty","qwert","werty","qwertyuiop","asdf","asdfg",
+        "asdfgh","asdfghjkl","zxcvb","zxcvbn","qazwsx","1qaz",
+        "2wsx","qaza","!qaz","1q2w","1q2w3e","qweasd","qweqwe"];
+      const DICT_WORDS = ["password","passw","pass","sunshine","monkey","dragon",
+        "master","welcome","letmein","iloveyou","superman","batman",
+        "football","princess","shadow","hello","login","admin",
+        "secret","abc","test","blue","red","green","sky","dog",
+        "cat","love","happy","summer","winter","spring","autumn",
+        "birthday","flower","music","soccer","basketball","baseball"];
+      const LABELS = ["Very Weak","Weak","Fair","Strong","Very Strong"];
 
-<script>
-// ── Preset passwords from the 8 research categories ──────────────────────────
-const presets = [
-  { label: "123456",          cat: "Common" },
-  { label: "password",        cat: "Common" },
-  { label: "password123",     cat: "Common" },
-  { label: "abcdef123",       cat: "Sequential" },
-  { label: "qwerty",          cat: "Keyboard" },
-  { label: "qwerty!@#",       cat: "Keyboard" },
-  { label: "aaaa1111",        cat: "Repeated" },
-  { label: "sunshine2024",    cat: "Dictionary" },
-  { label: "xK9#mP2!",        cat: "Random" },
-  { label: "tR7$vL4@",        cat: "Random" },
-  { label: "MyD0g!sN@med$am", cat: "Long/Complex" },
-  { label: "Blue$ky42!",      cat: "Mixed" },
-];
+      // ---------- DOM ELEMENTS ----------
+      const pwInput = document.getElementById('pwInput');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const exportBtn = document.getElementById('exportCSVBtn');
+      const clearLogBtn = document.getElementById('clearLogBtn');
+      const chipsContainer = document.getElementById('chips');
+      const tradScoreEl = document.getElementById('tradScore');
+      const tradLabelEl = document.getElementById('tradLabel');
+      const tradBarEl = document.getElementById('tradBar');
+      const tradFeedbackEl = document.getElementById('tradFeedback');
+      const heurScoreEl = document.getElementById('heurScore');
+      const heurLabelEl = document.getElementById('heurLabel');
+      const heurBarEl = document.getElementById('heurBar');
+      const heurFeedbackEl = document.getElementById('heurFeedback');
+      const tradCard = document.getElementById('tradCard');
+      const heurCard = document.getElementById('heurCard');
+      const logBody = document.getElementById('logBody');
+      const emptyLog = document.getElementById('emptyLog');
+      const logTable = document.getElementById('logTable');
+      const logCountSpan = document.getElementById('logCount');
 
-// Render chips
-const chipsEl = document.getElementById('chips');
-presets.forEach(p => {
-  const chip = document.createElement('button');
-  chip.className = 'chip';
-  chip.textContent = p.label;
-  chip.title = `Category: ${p.cat}`;
-  chip.onclick = () => {
-    document.getElementById('pwInput').value = p.label;
-    analyse();
-    // Scroll to results on mobile
-    if (window.innerWidth < 768) {
-      document.getElementById('tradCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-  chipsEl.appendChild(chip);
-});
+      let logData = [];
 
-// ── Common weak password list ─────────────────────────────────────────────────
-const COMMON = new Set([
-  "123456","password","123456789","12345678","12345","1234567","qwerty",
-  "abc123","111111","123123","admin","letmein","welcome","monkey","dragon",
-  "master","sunshine","princess","1234","password1","iloveyou","superman",
-  "batman","football","shadow","123321","000000","654321","qwerty123",
-  "password123","pass123","pass1234","mypassword","login","qwerty1","1q2w3e",
-  "zxcvbn","asdfgh","1234567890","987654321","qazwsx","passw0rd","p@ssword",
-  "qwertyuiop","abcdef","abcdef123","abc1234","sunshine2024"
-]);
+      // ---------- RENDER PRESET CHIPS ----------
+      presets.forEach(p => {
+        const chip = document.createElement('button');
+        chip.className = 'chip';
+        chip.textContent = p.label;
+        chip.title = `Category: ${p.cat}`;
+        chip.addEventListener('click', () => {
+          pwInput.value = p.label;
+          analyse();
+          if (window.innerWidth < 768) {
+            tradCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+        chipsContainer.appendChild(chip);
+      });
 
-// Sequential patterns
-const SEQ_ALPHA = ["abcdef","bcdefg","cdefgh","defghi","efghij","fghijk",
-                   "ghijkl","hijklm","ijklmn","jklmno","klmnop","lmnopq",
-                   "mnopqr","nopqrs","opqrst","pqrstu","qrstuv","rstuvw",
-                   "stuvwx","tuvwxy","uvwxyz","zyxwvu","yxwvut"];
-const SEQ_NUM  = ["0123","1234","2345","3456","4567","5678","6789",
-                  "01234","12345","23456","34567","45678","56789",
-                  "012345","123456","234567","345678","456789",
-                  "0123456","1234567","9876","87654","98765","987654","9876543"];
+      // ---------- CHECK FUNCTIONS ----------
+      function traditionalCheck(pw) {
+        let score = 0;
+        const checks = [];
+        if (pw.length >= 8) {
+          score++;
+          checks.push({ text: `Length ≥ 8 (${pw.length} chars)`, type: 'good' });
+        } else {
+          checks.push({ text: `Too short — minimum 8 characters (${pw.length} chars)`, type: 'bad' });
+        }
+        if (/[A-Z]/.test(pw)) {
+          score++;
+          checks.push({ text: 'Contains uppercase letter', type: 'good' });
+        } else {
+          checks.push({ text: 'Missing uppercase letter', type: 'bad' });
+        }
+        if (/[a-z]/.test(pw)) {
+          score++;
+          checks.push({ text: 'Contains lowercase letter', type: 'good' });
+        } else {
+          checks.push({ text: 'Missing lowercase letter', type: 'bad' });
+        }
+        if (/[0-9]/.test(pw)) {
+          score++;
+          checks.push({ text: 'Contains number', type: 'good' });
+        } else {
+          checks.push({ text: 'Missing number', type: 'bad' });
+        }
+        if (/[^A-Za-z0-9]/.test(pw)) {
+          score++;
+          checks.push({ text: 'Contains special character', type: 'good' });
+        } else {
+          checks.push({ text: 'Missing special character', type: 'bad' });
+        }
+        const finalScore = Math.min(4, Math.max(0, score - 1));
+        return { score: finalScore, label: LABELS[finalScore], feedback: checks };
+      }
 
-// Keyboard patterns
-const KB_PATTERNS = ["qwerty","qwert","werty","qwertyuiop","asdf","asdfg",
-                     "asdfgh","asdfghjkl","zxcvb","zxcvbn","qazwsx","1qaz",
-                     "2wsx","qaza","!qaz","1q2w","1q2w3e","qweasd","qweqwe"];
+      function heuristicCheck(pw) {
+        const lower = pw.toLowerCase();
+        let deductions = 0;
+        const checks = [];
+        if (COMMON.has(lower)) {
+          deductions += 4;
+          checks.push({ text: 'Matches known common password list', type: 'bad' });
+        }
+        const seqAlphaFound = SEQ_ALPHA.find(s => lower.includes(s));
+        if (seqAlphaFound) {
+          deductions += 2;
+          checks.push({ text: `Sequential letters detected ("${seqAlphaFound}")`, type: 'bad' });
+        }
+        const seqNumFound = SEQ_NUM.find(s => lower.includes(s));
+        if (seqNumFound) {
+          deductions += 2;
+          checks.push({ text: `Sequential numbers detected ("${seqNumFound}")`, type: 'bad' });
+        }
+        const kbFound = KB_PATTERNS.find(s => lower.includes(s));
+        if (kbFound) {
+          deductions += 2;
+          checks.push({ text: `Keyboard pattern detected ("${kbFound}")`, type: 'bad' });
+        }
+        if (/(.)\1{2,}/.test(lower)) {
+          deductions += 2;
+          checks.push({ text: 'Repeated character block detected', type: 'bad' });
+        }
+        const dictFound = DICT_WORDS.filter(w => lower.includes(w) && w.length >= 4);
+        if (dictFound.length > 0) {
+          deductions += dictFound.length >= 2 ? 2 : 1;
+          checks.push({ text: `Dictionary word(s) found: ${dictFound.slice(0,3).join(', ')}`, type: 'warn' });
+        }
+        if (/^[0-9]+$/.test(pw)) {
+          deductions += 2;
+          checks.push({ text: 'Digits only — no character variety', type: 'bad' });
+        } else if (/^[a-zA-Z]+$/.test(pw)) {
+          deductions += 1;
+          checks.push({ text: 'Letters only — add numbers or symbols', type: 'warn' });
+        }
+        if (pw.length < 8) {
+          deductions += 5;
+          checks.push({ text: `Too short (${pw.length} chars) — minimum 8`, type: 'bad' });
+        }
+        let base = 4;
+        if (pw.length >= 12) {
+          checks.push({ text: `Good length (${pw.length} chars)`, type: 'good' });
+        }
+        if (/[^A-Za-z0-9]/.test(pw)) {
+          checks.push({ text: 'Special character present', type: 'good' });
+        }
+        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) {
+          checks.push({ text: 'All character types present', type: 'good' });
+        }
+        const finalScore = Math.min(4, Math.max(0, base - Math.ceil(deductions / 2)));
+        return { score: finalScore, label: LABELS[finalScore], feedback: checks };
+      }
 
-// Dictionary fragments
-const DICT_WORDS = ["password","passw","pass","sunshine","monkey","dragon",
-                    "master","welcome","letmein","iloveyou","superman","batman",
-                    "football","princess","shadow","hello","login","admin",
-                    "secret","abc","test","blue","red","green","sky","dog",
-                    "cat","love","happy","summer","winter","spring","autumn",
-                    "birthday","flower","music","soccer","basketball","baseball"];
+      function setResult(prefix, result) {
+        const scoreEl = prefix === 'trad' ? tradScoreEl : heurScoreEl;
+        const labelEl = prefix === 'trad' ? tradLabelEl : heurLabelEl;
+        const barEl = prefix === 'trad' ? tradBarEl : heurBarEl;
+        const feedEl = prefix === 'trad' ? tradFeedbackEl : heurFeedbackEl;
+        const card = prefix === 'trad' ? tradCard : heurCard;
 
-const LABELS = ["Very Weak","Weak","Fair","Strong","Very Strong"];
+        const s = result.score;
+        scoreEl.textContent = s;
+        scoreEl.className = `score-num lvl-${s}`;
+        labelEl.textContent = result.label;
+        labelEl.className = `score-label lvl-${s}`;
+        barEl.className = `score-fill fill-${s}`;
+        feedEl.innerHTML = '';
+        result.feedback.forEach(f => {
+          const li = document.createElement('li');
+          li.textContent = f.text;
+          if (f.type === 'bad') li.classList.add('bad');
+          if (f.type === 'warn') li.classList.add('warn');
+          if (f.type === 'good') li.classList.add('good');
+          feedEl.appendChild(li);
+        });
+        card.className = 'method-card flash ' + (prefix === 'trad' ? 'active-trad' : 'active-heur');
+      }
 
-// ── TRADITIONAL METHOD ────────────────────────────────────────────────────────
-function traditionalCheck(pw) {
-  let score = 0;
-  const checks = [];
+      function addToLog(pw, trad, heur) {
+        logData.push({ pw, trad, heur, n: logData.length + 1 });
+        renderLog();
+      }
 
-  if (pw.length >= 8) {
-    score++;
-    checks.push({ text: `Length ≥ 8 (${pw.length} chars)`, type: 'good' });
-  } else {
-    checks.push({ text: `Too short — minimum 8 characters (${pw.length} chars)`, type: 'bad' });
-  }
+      function renderLog() {
+        logCountSpan.textContent = `${logData.length} test${logData.length !== 1 ? 's' : ''}`;
+        if (logData.length === 0) {
+          emptyLog.style.display = 'block';
+          logTable.style.display = 'none';
+          return;
+        }
+        emptyLog.style.display = 'none';
+        logTable.style.display = 'table';
+        logBody.innerHTML = '';
+        logData.forEach(d => {
+          const agree = d.trad.score === d.heur.score;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="color:var(--muted)">${d.n}</td>
+            <td class="pw-cell">${escHtml(d.pw)}</td>
+            <td style="color:var(--muted)">${d.pw.length}</td>
+            <td><span class="tag tag-${d.trad.score}">${d.trad.score}/4</span></td>
+            <td style="font-size:0.7rem">${d.trad.label}</td>
+            <td><span class="tag tag-${d.heur.score}">${d.heur.score}/4</span></td>
+            <td style="font-size:0.7rem">${d.heur.label}</td>
+            <td style="color:${agree ? 'var(--green)' : 'var(--orange)'};font-weight:700;font-size:0.7rem">
+              ${agree ? '✓' : '✗'}
+            </td>
+          `;
+          logBody.appendChild(tr);
+        });
+      }
 
-  if (/[A-Z]/.test(pw)) {
-    score++;
-    checks.push({ text: 'Contains uppercase letter', type: 'good' });
-  } else {
-    checks.push({ text: 'Missing uppercase letter', type: 'bad' });
-  }
+      function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
 
-  if (/[a-z]/.test(pw)) {
-    score++;
-    checks.push({ text: 'Contains lowercase letter', type: 'good' });
-  } else {
-    checks.push({ text: 'Missing lowercase letter', type: 'bad' });
-  }
+      function clearLog() {
+        if (logData.length === 0) return;
+        if (!confirm('Clear all recorded results?')) return;
+        logData = [];
+        renderLog();
+      }
 
-  if (/[0-9]/.test(pw)) {
-    score++;
-    checks.push({ text: 'Contains number', type: 'good' });
-  } else {
-    checks.push({ text: 'Missing number', type: 'bad' });
-  }
+      function exportCSV() {
+        if (logData.length === 0) {
+          alert('No data to export yet.');
+          return;
+        }
+        const header = '#,Password,Length,Trad Score,Trad Class,Heur Score,Heur Class,Agreement\n';
+        const rows = logData.map(d =>
+          `${d.n},"${d.pw}",${d.pw.length},${d.trad.score},"${d.trad.label}",${d.heur.score},"${d.heur.label}","${d.trad.score === d.heur.score ? 'Match' : 'Differ'}"`
+        ).join('\n');
+        const blob = new Blob([header + rows], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'password_results.csv';
+        a.click();
+      }
 
-  if (/[^A-Za-z0-9]/.test(pw)) {
-    score++;
-    checks.push({ text: 'Contains special character', type: 'good' });
-  } else {
-    checks.push({ text: 'Missing special character', type: 'bad' });
-  }
+      function analyse() {
+        const pw = pwInput.value.trim();
+        if (!pw) {
+          pwInput.focus();
+          alert('Please enter a password.');
+          return;
+        }
+        const trad = traditionalCheck(pw);
+        const heur = heuristicCheck(pw);
+        setResult('trad', trad);
+        setResult('heur', heur);
+        addToLog(pw, trad, heur);
+        if (window.innerWidth < 768) {
+          tradCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
 
-  // Cap at 4
-  const finalScore = Math.min(4, Math.max(0, score - 1));
-  return { score: finalScore, label: LABELS[finalScore], feedback: checks };
-}
+      function clearInput() {
+        pwInput.value = '';
+        pwInput.focus();
+      }
 
-// ── HEURISTIC METHOD ──────────────────────────────────────────────────────────
-function heuristicCheck(pw) {
-  const lower = pw.toLowerCase();
-  let deductions = 0;
-  const checks = [];
+      // ---------- EVENT LISTENERS ----------
+      analyzeBtn.addEventListener('click', analyse);
+      clearBtn.addEventListener('click', clearInput);
+      exportBtn.addEventListener('click', exportCSV);
+      clearLogBtn.addEventListener('click', clearLog);
+      pwInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          analyse();
+        }
+      });
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          if (document.activeElement && document.activeElement.scrollIntoViewIfNeeded) {
+            document.activeElement.scrollIntoViewIfNeeded();
+          }
+        }, 300);
+      });
 
-  // 1. Common password check
-  if (COMMON.has(lower)) {
-    deductions += 4;
-    checks.push({ text: 'Matches known common password list', type: 'bad' });
-  }
-
-  // 2. Sequential alpha patterns
-  const seqAlphaFound = SEQ_ALPHA.find(s => lower.includes(s));
-  if (seqAlphaFound) {
-    deductions += 2;
-    checks.push({ text: `Sequential letters detected ("${seqAlphaFound}")`, type: 'bad' });
-  }
-
-  // 3. Sequential numeric patterns
-  const seqNumFound = SEQ_NUM.find(s => lower.includes(s));
-  if (seqNumFound) {
-    deductions += 2;
-    checks.push({ text: `Sequential numbers detected ("${seqNumFound}")`, type: 'bad' });
-  }
-
-  // 4. Keyboard patterns
-  const kbFound = KB_PATTERNS.find(s => lower.includes(s));
-  if (kbFound) {
-    deductions += 2;
-    checks.push({ text: `Keyboard pattern detected ("${kbFound}")`, type: 'bad' });
-  }
-
-  // 5. Repeated characters
-  if (/(.)\1{2,}/.test(lower)) {
-    deductions += 2;
-    checks.push({ text: 'Repeated character block detected', type: 'bad' });
-  }
-
-  // 6. Dictionary words
-  const dictFound = DICT_WORDS.filter(w => lower.includes(w) && w.length >= 4);
-  if (dictFound.length > 0) {
-    deductions += dictFound.length >= 2 ? 2 : 1;
-    checks.push({ text: `Dictionary word(s) found: ${dictFound.slice(0,3).join(', ')}`, type: 'warn' });
-  }
-
-  // 7. All same character type only
-  if (/^[0-9]+$/.test(pw)) {
-    deductions += 2;
-    checks.push({ text: 'Digits only — no character variety', type: 'bad' });
-  } else if (/^[a-zA-Z]+$/.test(pw)) {
-    deductions += 1;
-    checks.push({ text: 'Letters only — add numbers or symbols', type: 'warn' });
-  }
-
-  // 8. Too short
-  if (pw.length < 8) {
-    deductions += 5;
-    checks.push({ text: `Too short (${pw.length} chars) — minimum 8`, type: 'bad' });
-  }
-
-  // Positive signals
-  let base = 4;
-  if (pw.length >= 12) {
-    checks.push({ text: `Good length (${pw.length} chars)`, type: 'good' });
-  }
-  if (/[^A-Za-z0-9]/.test(pw)) {
-    checks.push({ text: 'Special character present', type: 'good' });
-  }
-  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) {
-    checks.push({ text: 'All character types present', type: 'good' });
-  }
-
-  const finalScore = Math.min(4, Math.max(0, base - Math.ceil(deductions / 2)));
-  return { score: finalScore, label: LABELS[finalScore], feedback: checks };
-}
-
-// ── UI helpers ────────────────────────────────────────────────────────────────
-function setResult(prefix, result) {
-  const scoreEl = document.getElementById(prefix + 'Score');
-  const labelEl = document.getElementById(prefix + 'Label');
-  const barEl   = document.getElementById(prefix + 'Bar');
-  const feedEl  = document.getElementById(prefix + 'Feedback');
-
-  const s = result.score;
-  scoreEl.textContent = s;
-  scoreEl.className = `score-num lvl-${s}`;
-  labelEl.textContent = result.label;
-  labelEl.className = `score-label lvl-${s}`;
-
-  barEl.className = `score-fill fill-${s}`;
-
-  feedEl.innerHTML = '';
-  result.feedback.forEach(f => {
-    const li = document.createElement('li');
-    li.textContent = f.text;
-    if (f.type === 'bad')  li.classList.add('bad');
-    if (f.type === 'warn') li.classList.add('warn');
-    if (f.type === 'good') li.classList.add('good');
-    feedEl.appendChild(li);
-  });
-
-  const card = document.getElementById(prefix + 'Card');
-  card.className = 'method-card flash ' + (prefix === 'trad' ? 'active-trad' : 'active-heur');
-}
-
-// Log data
-let logData = [];
-
-function addToLog(pw, trad, heur) {
-  logData.push({ pw, trad, heur, n: logData.length + 1 });
-  renderLog();
-}
-
-function renderLog() {
-  const body = document.getElementById('logBody');
-  const empty = document.getElementById('emptyLog');
-  const table = document.getElementById('logTable');
-  const count = document.getElementById('logCount');
-
-  count.textContent = `${logData.length} test${logData.length !== 1 ? 's' : ''}`;
-
-  if (logData.length === 0) {
-    empty.style.display = 'block';
-    table.style.display = 'none';
-    return;
-  }
-
-  empty.style.display = 'none';
-  table.style.display = 'table';
-
-  body.innerHTML = '';
-  logData.forEach(d => {
-    const agree = d.trad.score === d.heur.score;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="color:var(--muted)">${d.n}</td>
-      <td class="pw-cell">${escHtml(d.pw)}</td>
-      <td style="color:var(--muted)">${d.pw.length}</td>
-      <td><span class="tag tag-${d.trad.score}">${d.trad.score}/4</span></td>
-      <td style="font-size:0.7rem">${d.trad.label}</td>
-      <td><span class="tag tag-${d.heur.score}">${d.heur.score}/4</span></td>
-      <td style="font-size:0.7rem">${d.heur.label}</td>
-      <td style="color:${agree ? 'var(--green)' : 'var(--orange)'};font-weight:700;font-size:0.7rem">
-        ${agree ? '✓' : '✗'}
-      </td>
-    `;
-    body.appendChild(tr);
-  });
-}
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function clearLog() {
-  if (logData.length === 0) return;
-  if (!confirm('Clear all recorded results?')) return;
-  logData = [];
-  renderLog();
-}
-
-function exportCSV() {
-  if (logData.length === 0) { alert('No data to export yet.'); return; }
-  const header = '#,Password,Length,Trad Score,Trad Class,Heur Score,Heur Class,Agreement\n';
-  const rows = logData.map(d =>
-    `${d.n},"${d.pw}",${d.pw.length},${d.trad.score},"${d.trad.label}",${d.heur.score},"${d.heur.label}","${d.trad.score === d.heur.score ? 'Match' : 'Differ'}"`
-  ).join('\n');
-  const blob = new Blob([header + rows], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'password_results.csv';
-  a.click();
-}
-
-// ── Main analyse function ─────────────────────────────────────────────────────
-function analyse() {
-  const pwInput = document.getElementById('pwInput');
-  const pw = pwInput.value.trim();
-  if (!pw) { 
-    pwInput.focus();
-    alert('Please enter a password.'); 
-    return; 
-  }
-
-  const trad = traditionalCheck(pw);
-  const heur = heuristicCheck(pw);
-
-  setResult('trad', trad);
-  setResult('heur', heur);
-  addToLog(pw, trad, heur);
-  
-  // Scroll to results on mobile
-  if (window.innerWidth < 768) {
-    document.getElementById('tradCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-function clearInput() {
-  const pwInput = document.getElementById('pwInput');
-  pwInput.value = '';
-  pwInput.focus();
-}
-
-// Enter key support
-document.getElementById('pwInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    analyse();
-  }
-});
-
-// Auto-focus input on load
-document.getElementById('pwInput').focus();
-
-// Handle orientation changes
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    if (document.activeElement) {
-      document.activeElement.scrollIntoViewIfNeeded?.();
-    }
-  }, 300);
-});
-</script>
+      // Initial focus
+      pwInput.focus();
+    })();
+  </script>
 </body>
 </html>
